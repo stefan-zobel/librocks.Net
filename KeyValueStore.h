@@ -93,6 +93,8 @@ namespace librocks::Net {
 
 			bool PutIfAbsent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
 
+			void Put(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
+
 			private:
 				KVStore* _nativePtr;
 
