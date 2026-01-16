@@ -105,6 +105,9 @@ namespace librocks::Net {
         }
     }
 
+#pragma warning(push)
+#pragma warning(disable:4996)
+
     NativeBytes^ KeyValueStore::UpdateIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value)
     {
         ThrowIfDisposed();
@@ -374,4 +377,53 @@ namespace librocks::Net {
             throw gcnew Exception("An unexpected error occurred during FindMaxKey() operation.");
         }
     }
+
+    bool KeyValueStore::TryUpdateIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value, Span<Byte> dest, int% bytesWritten)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        std::string_view nativeKeyView;
+        std::string_view nativeValueView;
+
+        pin_ptr<const Byte> pKey;
+        pin_ptr<const Byte> pValue;
+
+        if (key.Length > 0) {
+            pKey = &MemoryMarshal::GetReference(key);
+            nativeKeyView = std::string_view(reinterpret_cast<const char*>(pKey), key.Length);
+        }
+
+        if (value.Length > 0) {
+            pValue = &MemoryMarshal::GetReference(value);
+            nativeValueView = std::string_view(reinterpret_cast<const char*>(pValue), value.Length);
+        }
+
+        try {
+            bytes result = _nativePtr->updateIfPresent(*(kind->_nativePtr), nativeKeyView, nativeValueView);
+
+            if (!result) return false;
+			// Check target span size
+            int resultSize = static_cast<int>(result.size());
+            if (dest.Length < resultSize) return false;
+
+			// Pin the destination span to get a stable pointer
+            if (resultSize > 0) {
+                pin_ptr<Byte> pDest = &MemoryMarshal::GetReference(dest);
+				// Copy the data
+                memcpy(pDest, result.data(), resultSize);
+            }
+
+            bytesWritten = resultSize;
+            return true;
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during TryUpdateIfPresent() operation.");
+        }
+    }
+
+#pragma warning(pop)
 }

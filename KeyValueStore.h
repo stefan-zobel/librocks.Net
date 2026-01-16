@@ -28,6 +28,7 @@ namespace marshal = msclr::interop;
 using namespace System;
 using namespace System::Collections::Concurrent;
 using namespace System::Collections::Generic;
+using namespace System::Runtime::InteropServices;
 
 namespace librocks::Net {
 
@@ -89,7 +90,10 @@ namespace librocks::Net {
 
 			void CompactAll();
 
-			NativeBytes^ UpdateIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
+#pragma warning(push)
+#pragma warning(disable:4996)
+
+			NativeBytes^ UpdateIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value); // 1
 
 			bool PutIfAbsent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
 
@@ -109,17 +113,22 @@ namespace librocks::Net {
 
 			NativeBytes^ FindMaxKey(Kind^ kind);
 
-			private:
-				KVStore* _nativePtr;
+			bool TryUpdateIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value, Span<Byte> dest, [Out] int% bytesWritten);
 
-				void ThrowIfDisposed() {
-					if (_nativePtr == nullptr) {
-						throw gcnew ObjectDisposedException("KeyValueStore");
-					}
+
+
+#pragma warning(pop)
+		private:
+			KVStore* _nativePtr;
+
+			void ThrowIfDisposed() {
+				if (_nativePtr == nullptr) {
+					throw gcnew ObjectDisposedException("KeyValueStore");
 				}
+			}
 
-				Kind^ WrapKind(const ::Kind* nativePtr);
-				Kind^ CreateKindWrapper(IntPtr key);
-				ConcurrentDictionary<IntPtr, Kind^>^ _kindCache;
+			Kind^ WrapKind(const ::Kind* nativePtr);
+			Kind^ CreateKindWrapper(IntPtr key);
+			ConcurrentDictionary<IntPtr, Kind^>^ _kindCache;
 	};
 }
