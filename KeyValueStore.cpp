@@ -212,4 +212,131 @@ namespace librocks::Net {
             throw gcnew Exception("An unexpected error occurred during Put() operation.");
         }
     }
+
+    NativeBytes^ KeyValueStore::Get(Kind^ kind, ReadOnlySpan<Byte> key)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        std::string_view nativeKeyView;
+        pin_ptr<const Byte> pKey;
+
+        if (key.Length > 0) {
+            pKey = &MemoryMarshal::GetReference(key);
+            nativeKeyView = std::string_view(reinterpret_cast<const char*>(pKey), key.Length);
+        }
+
+        try {
+            bytes result = _nativePtr->get(*(kind->_nativePtr), nativeKeyView);
+            if (!result) return nullptr;
+            return gcnew NativeBytes(std::move(result));
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during Get() operation.");
+        }
+    }
+
+    NativeBytes^ KeyValueStore::SingleRemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        std::string_view nativeKeyView;
+        pin_ptr<const Byte> pKey;
+
+        if (key.Length > 0) {
+            pKey = &MemoryMarshal::GetReference(key);
+            nativeKeyView = std::string_view(reinterpret_cast<const char*>(pKey), key.Length);
+        }
+
+        try {
+            bytes result = _nativePtr->singleRemoveIfPresent(*(kind->_nativePtr), nativeKeyView);
+            if (!result) return nullptr;
+            return gcnew NativeBytes(std::move(result));
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during SingleRemoveIfPresent() operation.");
+        }
+    }
+
+    NativeBytes^ KeyValueStore::RemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        std::string_view nativeKeyView;
+        pin_ptr<const Byte> pKey;
+
+        if (key.Length > 0) {
+            pKey = &MemoryMarshal::GetReference(key);
+            nativeKeyView = std::string_view(reinterpret_cast<const char*>(pKey), key.Length);
+        }
+
+        try {
+            bytes result = _nativePtr->removeIfPresent(*(kind->_nativePtr), nativeKeyView);
+            if (!result) return nullptr;
+            return gcnew NativeBytes(std::move(result));
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during RemoveIfPresent() operation.");
+        }
+    }
+
+    void KeyValueStore::SingleRemove(Kind^ kind, ReadOnlySpan<Byte> key)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        std::string_view nativeKeyView;
+        pin_ptr<const Byte> pKey;
+
+        if (key.Length > 0) {
+            pKey = &MemoryMarshal::GetReference(key);
+            nativeKeyView = std::string_view(reinterpret_cast<const char*>(pKey), key.Length);
+        }
+
+        try {
+            _nativePtr->singleRemove(*(kind->_nativePtr), nativeKeyView);
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during SingleRemove() operation.");
+        }
+    }
+
+    void KeyValueStore::Remove(Kind^ kind, ReadOnlySpan<Byte> key)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        std::string_view nativeKeyView;
+        pin_ptr<const Byte> pKey;
+
+        if (key.Length > 0) {
+            pKey = &MemoryMarshal::GetReference(key);
+            nativeKeyView = std::string_view(reinterpret_cast<const char*>(pKey), key.Length);
+        }
+
+        try {
+            _nativePtr->remove(*(kind->_nativePtr), nativeKeyView);
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during Remove() operation.");
+        }
+    }
+
 }

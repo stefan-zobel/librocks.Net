@@ -95,6 +95,16 @@ namespace librocks::Net {
 
 			void Put(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
 
+			NativeBytes^ Get(Kind^ kind, ReadOnlySpan<Byte> key);
+
+			NativeBytes^ SingleRemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key);
+
+			NativeBytes^ RemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key);
+
+			void SingleRemove(Kind^ kind, ReadOnlySpan<Byte> key);
+
+			void Remove(Kind^ kind, ReadOnlySpan<Byte> key);
+
 			private:
 				KVStore* _nativePtr;
 
