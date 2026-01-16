@@ -339,4 +339,39 @@ namespace librocks::Net {
         }
     }
 
+    NativeBytes^ KeyValueStore::FindMinKey(Kind^ kind)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        try {
+            bytes result = _nativePtr->findMinKey(*(kind->_nativePtr));
+            if (!result) return nullptr;
+            return gcnew NativeBytes(std::move(result));
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during FindMinKey() operation.");
+        }
+    }
+
+    NativeBytes^ KeyValueStore::FindMaxKey(Kind^ kind)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        try {
+            bytes result = _nativePtr->findMaxKey(*(kind->_nativePtr));
+            if (!result) return nullptr;
+            return gcnew NativeBytes(std::move(result));
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during FindMaxKey() operation.");
+        }
+    }
 }

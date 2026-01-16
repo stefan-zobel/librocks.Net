@@ -105,6 +105,10 @@ namespace librocks::Net {
 
 			void Remove(Kind^ kind, ReadOnlySpan<Byte> key);
 
+			NativeBytes^ FindMinKey(Kind^ kind);
+
+			NativeBytes^ FindMaxKey(Kind^ kind);
+
 			private:
 				KVStore* _nativePtr;
 
