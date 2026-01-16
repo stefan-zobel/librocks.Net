@@ -91,6 +91,8 @@ namespace librocks::Net {
 
 			NativeBytes^ UpdateIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
 
+			bool PutIfAbsent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
+
 			private:
 				KVStore* _nativePtr;
 

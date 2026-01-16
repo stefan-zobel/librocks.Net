@@ -148,4 +148,36 @@ namespace librocks::Net {
             throw gcnew Exception("An unexpected error occurred during UpdateIfPresent() operation.");
         }
     }
+
+    bool KeyValueStore::PutIfAbsent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        std::string_view nativeKeyView;
+        std::string_view nativeValueView;
+
+        pin_ptr<const Byte> pKey;
+        pin_ptr<const Byte> pValue;
+
+        if (key.Length > 0) {
+            pKey = &MemoryMarshal::GetReference(key);
+            nativeKeyView = std::string_view(reinterpret_cast<const char*>(pKey), key.Length);
+        }
+
+        if (value.Length > 0) {
+            pValue = &MemoryMarshal::GetReference(value);
+            nativeValueView = std::string_view(reinterpret_cast<const char*>(pValue), value.Length);
+        }
+        return false;
+        try {
+            return _nativePtr->putIfAbsent(*(kind->_nativePtr), nativeKeyView, nativeValueView);
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during UpdateIfPresent() operation.");
+        }
+    }
 }
