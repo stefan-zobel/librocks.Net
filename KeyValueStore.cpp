@@ -41,7 +41,7 @@ namespace librocks::Net {
     Kind^ KeyValueStore::GetDefaultKind()
     {
         ThrowIfDisposed();
-		const ::Kind& nativeKind = _nativePtr->getDefaultKind();
+        const ::Kind& nativeKind = _nativePtr->getDefaultKind();
         return WrapKind(&nativeKind);
     }
 
@@ -80,14 +80,14 @@ namespace librocks::Net {
                 _nativePtr->compact(*pKind);
             }
             catch (const RocksException& ex) {
-				throw gcnew RocksDbException(ex.code(), gcnew String(ex.what()));
-			}
+                throw gcnew RocksDbException(ex.code(), gcnew String(ex.what()));
+            }
             catch (...)
             {
                 throw gcnew Exception("An unexpected error occurred during compaction of : "
                     + kind->Name);
             }
-		}
+        }
     }
 
     void KeyValueStore::CompactAll()
@@ -113,17 +113,17 @@ namespace librocks::Net {
         ThrowIfDisposed();
         if (kind == nullptr) throw gcnew ArgumentNullException("kind");
 
-		// Create initially empty string_views
+        // Create initially empty string_views
         std::string_view nativeKeyView;
         std::string_view nativeValueView;
 
         // The pin_ptr's must be declared here at method scope level!
-		// (Otherwise the .NET GC could move the underlying memory
+        // (Otherwise the .NET GC could move the underlying memory
         // while we are still using the pointers!)
         pin_ptr<const Byte> pKey;
         pin_ptr<const Byte> pValue;
 
-		// Pin the managed spans to get a stable pointer for the
+        // Pin the managed spans to get a stable pointer for the
         // duration of the use of the string_views.
         if (key.Length > 0) {
             pKey = &MemoryMarshal::GetReference(key);
@@ -136,7 +136,7 @@ namespace librocks::Net {
         }
 
         try {
-			// (If Length was 0 the empty string_view from above gets passed)
+            // (If Length was 0 the empty string_view from above gets passed)
             bytes result = _nativePtr->updateIfPresent(*(kind->_nativePtr), nativeKeyView, nativeValueView);
 
             if (!result) return nullptr;
@@ -403,14 +403,14 @@ namespace librocks::Net {
             bytes result = _nativePtr->updateIfPresent(*(kind->_nativePtr), nativeKeyView, nativeValueView);
 
             if (!result) return false;
-			// Check target span size
+            // Check target span size
             int resultSize = static_cast<int>(result.size());
             if (dest.Length < resultSize) return false;
 
-			// Pin the destination span to get a stable pointer
+            // Pin the destination span to get a stable pointer
             if (resultSize > 0) {
                 pin_ptr<Byte> pDest = &MemoryMarshal::GetReference(dest);
-				// Copy the data
+                // Copy the data
                 memcpy(pDest, result.data(), resultSize);
             }
 
@@ -422,6 +422,170 @@ namespace librocks::Net {
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during TryUpdateIfPresent() operation.");
+        }
+    }
+
+    bool KeyValueStore::TryGet(Kind^ kind, ReadOnlySpan<Byte> key, Span<Byte> dest, int% bytesWritten)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        std::string_view nativeKeyView;
+        pin_ptr<const Byte> pKey;
+
+        if (key.Length > 0) {
+            pKey = &MemoryMarshal::GetReference(key);
+            nativeKeyView = std::string_view(reinterpret_cast<const char*>(pKey), key.Length);
+        }
+
+        try {
+            bytes result = _nativePtr->get(*(kind->_nativePtr), nativeKeyView);
+
+            if (!result) return false;
+            int resultSize = static_cast<int>(result.size());
+            if (dest.Length < resultSize) return false;
+
+            if (resultSize > 0) {
+                pin_ptr<Byte> pDest = &MemoryMarshal::GetReference(dest);
+                memcpy(pDest, result.data(), resultSize);
+            }
+
+            bytesWritten = resultSize;
+            return true;
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during TryGet() operation.");
+        }
+    }
+
+    bool KeyValueStore::TrySingleRemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, Span<Byte> dest, int% bytesWritten)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        std::string_view nativeKeyView;
+        pin_ptr<const Byte> pKey;
+
+        if (key.Length > 0) {
+            pKey = &MemoryMarshal::GetReference(key);
+            nativeKeyView = std::string_view(reinterpret_cast<const char*>(pKey), key.Length);
+        }
+
+        try {
+            bytes result = _nativePtr->singleRemoveIfPresent(*(kind->_nativePtr), nativeKeyView);
+
+            if (!result) return false;
+            int resultSize = static_cast<int>(result.size());
+            if (dest.Length < resultSize) return false;
+
+            if (resultSize > 0) {
+                pin_ptr<Byte> pDest = &MemoryMarshal::GetReference(dest);
+                memcpy(pDest, result.data(), resultSize);
+            }
+
+            bytesWritten = resultSize;
+            return true;
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during TrySingleRemoveIfPresent() operation.");
+        }
+    }
+
+    bool KeyValueStore::TryRemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, Span<Byte> dest, int% bytesWritten)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        std::string_view nativeKeyView;
+        pin_ptr<const Byte> pKey;
+
+        if (key.Length > 0) {
+            pKey = &MemoryMarshal::GetReference(key);
+            nativeKeyView = std::string_view(reinterpret_cast<const char*>(pKey), key.Length);
+        }
+
+        try {
+            bytes result = _nativePtr->removeIfPresent(*(kind->_nativePtr), nativeKeyView);
+
+            if (!result) return false;
+            int resultSize = static_cast<int>(result.size());
+            if (dest.Length < resultSize) return false;
+
+            if (resultSize > 0) {
+                pin_ptr<Byte> pDest = &MemoryMarshal::GetReference(dest);
+                memcpy(pDest, result.data(), resultSize);
+            }
+
+            bytesWritten = resultSize;
+            return true;
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during TryRemoveIfPresent() operation.");
+        }
+    }
+
+    bool KeyValueStore::TryFindMinKey(Kind^ kind, Span<Byte> dest, int% bytesWritten)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        try {
+            bytes result = _nativePtr->findMinKey(*(kind->_nativePtr));
+
+            if (!result) return false;
+            int resultSize = static_cast<int>(result.size());
+            if (dest.Length < resultSize) return false;
+
+            if (resultSize > 0) {
+                pin_ptr<Byte> pDest = &MemoryMarshal::GetReference(dest);
+                memcpy(pDest, result.data(), resultSize);
+            }
+
+            bytesWritten = resultSize;
+            return true;
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during TryFindMinKey() operation.");
+        }
+    }
+
+    bool KeyValueStore::TryFindMaxKey(Kind^ kind, Span<Byte> dest, int% bytesWritten)
+    {
+        ThrowIfDisposed();
+        if (kind == nullptr) throw gcnew ArgumentNullException("kind");
+
+        try {
+            bytes result = _nativePtr->findMaxKey(*(kind->_nativePtr));
+
+            if (!result) return false;
+            int resultSize = static_cast<int>(result.size());
+            if (dest.Length < resultSize) return false;
+
+            if (resultSize > 0) {
+                pin_ptr<Byte> pDest = &MemoryMarshal::GetReference(dest);
+                memcpy(pDest, result.data(), resultSize);
+            }
+
+            bytesWritten = resultSize;
+            return true;
+        }
+        catch (const RocksException& e) {
+            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred during TryFindMaxKey() operation.");
         }
     }
 

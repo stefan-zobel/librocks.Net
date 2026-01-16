@@ -32,103 +32,112 @@ using namespace System::Runtime::InteropServices;
 
 namespace librocks::Net {
 
-	public ref class KeyValueStore
-	{
-		public:
-			KeyValueStore(String^ path) {
-				if (path == nullptr) throw gcnew ArgumentNullException("path");
-				std::string dbPath { marshal::marshal_as<std::string>(path) };
-				try {
-					_nativePtr = new KVStore(dbPath);
-				}
-				catch (const RocksException& e) {
-					_nativePtr = nullptr;
-					throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
-				}
-				catch (...) {
-					_nativePtr = nullptr;
-					throw gcnew Exception("An unknown error occurred during KeyValueStore initialization.");
-				}
-			}
+    public ref class KeyValueStore
+    {
+        public:
+            KeyValueStore(String^ path) {
+                if (path == nullptr) throw gcnew ArgumentNullException("path");
+                std::string dbPath { marshal::marshal_as<std::string>(path) };
+                try {
+                    _nativePtr = new KVStore(dbPath);
+                }
+                catch (const RocksException& e) {
+                    _nativePtr = nullptr;
+                    throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+                }
+                catch (...) {
+                    _nativePtr = nullptr;
+                    throw gcnew Exception("An unknown error occurred during KeyValueStore initialization.");
+                }
+            }
 
-			// Inherited via IDisposable
-			~KeyValueStore() { this->!KeyValueStore(); } // Dispose()
+            // Inherited via IDisposable
+            ~KeyValueStore() { this->!KeyValueStore(); } // Dispose()
 
-		protected:
-			// Finalizer
-			!KeyValueStore() {
-				if (_nativePtr) {
-					if (_kindCache) {
-						_kindCache->Clear();
-						_kindCache = nullptr;
-					}
-					delete _nativePtr;
-					_nativePtr = nullptr;
-				}
-			}
+        protected:
+            // Finalizer
+            !KeyValueStore() {
+                if (_nativePtr) {
+                    if (_kindCache) {
+                        _kindCache->Clear();
+                        _kindCache = nullptr;
+                    }
+                    delete _nativePtr;
+                    _nativePtr = nullptr;
+                }
+            }
 
-		public:
-			void Close() {
-				delete this;
-			}
+        public:
+            void Close() {
+                delete this;
+            }
 
-			property bool IsOpen {
-				bool get() {
-					return _nativePtr != nullptr && _nativePtr->isOpen();
-				}
-			}
+            property bool IsOpen {
+                bool get() {
+                    return _nativePtr != nullptr && _nativePtr->isOpen();
+                }
+            }
 
-			// starting here each method needs to call ThrowIfDisposed!
+            // starting here each method needs to call ThrowIfDisposed!
 
-			Kind^ GetDefaultKind();
+            Kind^ GetDefaultKind();
 
-			Kind^ GetOrCreateKind(String^ kindName);
+            Kind^ GetOrCreateKind(String^ kindName);
 
-			IReadOnlyCollection<Kind^>^ GetKinds();
+            IReadOnlyCollection<Kind^>^ GetKinds();
 
-			void Compact(Kind^ kind);
+            void Compact(Kind^ kind);
 
-			void CompactAll();
+            void CompactAll();
 
 #pragma warning(push)
 #pragma warning(disable:4996)
 
-			NativeBytes^ UpdateIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value); // 1
+            NativeBytes^ UpdateIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
 
-			bool PutIfAbsent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
+            bool PutIfAbsent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
 
-			void Put(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
+            void Put(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value);
 
-			NativeBytes^ Get(Kind^ kind, ReadOnlySpan<Byte> key);
+            NativeBytes^ Get(Kind^ kind, ReadOnlySpan<Byte> key);
 
-			NativeBytes^ SingleRemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key);
+            NativeBytes^ SingleRemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key);
 
-			NativeBytes^ RemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key);
+            NativeBytes^ RemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key);
 
-			void SingleRemove(Kind^ kind, ReadOnlySpan<Byte> key);
+            void SingleRemove(Kind^ kind, ReadOnlySpan<Byte> key);
 
-			void Remove(Kind^ kind, ReadOnlySpan<Byte> key);
+            void Remove(Kind^ kind, ReadOnlySpan<Byte> key);
 
-			NativeBytes^ FindMinKey(Kind^ kind);
+            NativeBytes^ FindMinKey(Kind^ kind);
 
-			NativeBytes^ FindMaxKey(Kind^ kind);
+            NativeBytes^ FindMaxKey(Kind^ kind);
 
-			bool TryUpdateIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value, Span<Byte> dest, [Out] int% bytesWritten);
+            bool TryUpdateIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, ReadOnlySpan<Byte> value, Span<Byte> dest, [Out] int% bytesWritten);
 
+            bool TryGet(Kind^ kind, ReadOnlySpan<Byte> key, Span<Byte> dest, [Out] int% bytesWritten);
+
+            bool TrySingleRemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, Span<Byte> dest, [Out] int% bytesWritten);
+
+            bool TryRemoveIfPresent(Kind^ kind, ReadOnlySpan<Byte> key, Span<Byte> dest, [Out] int% bytesWritten);
+
+            bool TryFindMinKey(Kind^ kind, Span<Byte> dest, [Out] int% bytesWritten);
+
+            bool TryFindMaxKey(Kind^ kind, Span<Byte> dest, [Out] int% bytesWritten);
 
 
 #pragma warning(pop)
-		private:
-			KVStore* _nativePtr;
+        private:
+            KVStore* _nativePtr;
 
-			void ThrowIfDisposed() {
-				if (_nativePtr == nullptr) {
-					throw gcnew ObjectDisposedException("KeyValueStore");
-				}
-			}
+            void ThrowIfDisposed() {
+                if (_nativePtr == nullptr) {
+                    throw gcnew ObjectDisposedException("KeyValueStore");
+                }
+            }
 
-			Kind^ WrapKind(const ::Kind* nativePtr);
-			Kind^ CreateKindWrapper(IntPtr key);
-			ConcurrentDictionary<IntPtr, Kind^>^ _kindCache;
-	};
+            Kind^ WrapKind(const ::Kind* nativePtr);
+            Kind^ CreateKindWrapper(IntPtr key);
+            ConcurrentDictionary<IntPtr, Kind^>^ _kindCache;
+    };
 }

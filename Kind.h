@@ -21,78 +21,78 @@ using namespace System;
 
 namespace librocks::Net {
 
-	public ref class Kind sealed : IComparable<Kind^>
-	{
-		internal:
-			Kind(const ::Kind* nativeKind) : _nativePtr(nativeKind) {}
+    public ref class Kind sealed : IComparable<Kind^>
+    {
+        internal:
+            Kind(const ::Kind* nativeKind) : _nativePtr(nativeKind) {}
 
-		public:
-			property String^ Name {
-				String^ get() {
-					if (!_nativePtr) return String::Empty;
-					return gcnew String(_nativePtr->name());
-				}
-			}
+        public:
+            property String^ Name {
+                String^ get() {
+                    if (!_nativePtr) return String::Empty;
+                    return gcnew String(_nativePtr->name());
+                }
+            }
 
-			property bool IsValid {
-				bool get() {
-					if (!_nativePtr) return false;
-					return _nativePtr->isValid();
-				}
-			}
+            property bool IsValid {
+                bool get() {
+                    if (!_nativePtr) return false;
+                    return _nativePtr->isValid();
+                }
+            }
 
-			virtual bool Equals(Object^ obj) override {
-				if (ReferenceEquals(obj, nullptr)) return false;
-				if (ReferenceEquals(this, obj)) return true;
-				Kind^ other = dynamic_cast<Kind^>(obj);
-				if (other == nullptr) return false;
-				if (!_nativePtr) return false;
-				return _nativePtr->equals(other->_nativePtr);
-			}
+            virtual bool Equals(Object^ obj) override {
+                if (ReferenceEquals(obj, nullptr)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                Kind^ other = dynamic_cast<Kind^>(obj);
+                if (other == nullptr) return false;
+                if (!_nativePtr) return false;
+                return _nativePtr->equals(other->_nativePtr);
+            }
 
-			virtual int GetHashCode() override {
-				if (!_nativePtr) return 0;
-				return static_cast<int>(_nativePtr->hash());
-			}
+            virtual int GetHashCode() override {
+                if (!_nativePtr) return 0;
+                return static_cast<int>(_nativePtr->hash());
+            }
 
-			virtual String^ ToString() override {
-				if (!_nativePtr) return "Disposed Kind";
-				return gcnew String(_nativePtr->toString(), 0,
-					(int)strlen(_nativePtr->toString()), System::Text::Encoding::UTF8);
-			}
+            virtual String^ ToString() override {
+                if (!_nativePtr) return "Disposed Kind";
+                return gcnew String(_nativePtr->toString(), 0,
+                    (int)strlen(_nativePtr->toString()), System::Text::Encoding::UTF8);
+            }
 
-			virtual int CompareTo(Kind^ other) {
-				if (other == nullptr) return 1;
-				if (_nativePtr == other->_nativePtr) return 0;
-				if (this->_nativePtr == nullptr) return -1;
-				if (other->_nativePtr == nullptr) return 1;
-				if (*_nativePtr < *(other->_nativePtr)) return -1;
-				if (*(other->_nativePtr) < *_nativePtr) return 1;
-				return 0;
-			}
+            virtual int CompareTo(Kind^ other) {
+                if (other == nullptr) return 1;
+                if (_nativePtr == other->_nativePtr) return 0;
+                if (this->_nativePtr == nullptr) return -1;
+                if (other->_nativePtr == nullptr) return 1;
+                if (*_nativePtr < *(other->_nativePtr)) return -1;
+                if (*(other->_nativePtr) < *_nativePtr) return 1;
+                return 0;
+            }
 
-			static bool operator < (Kind^ a, Kind^ b) {
-				if (ReferenceEquals(a, b)) return false;
-				if (ReferenceEquals(a, nullptr)) return true;
-				if (ReferenceEquals(b, nullptr)) return false;
-				return a->CompareTo(b) < 0;
-			}
+            static bool operator < (Kind^ a, Kind^ b) {
+                if (ReferenceEquals(a, b)) return false;
+                if (ReferenceEquals(a, nullptr)) return true;
+                if (ReferenceEquals(b, nullptr)) return false;
+                return a->CompareTo(b) < 0;
+            }
 
-			static bool operator > (Kind^ a, Kind^ b) {
-				return b < a;
-			}
+            static bool operator > (Kind^ a, Kind^ b) {
+                return b < a;
+            }
 
-			static bool operator == (Kind^ a, Kind^ b) {
-				if (ReferenceEquals(a, b)) return true;
-				if (ReferenceEquals(a, nullptr) || ReferenceEquals(b, nullptr)) return false;
-				return a->Equals(b);
-			}
+            static bool operator == (Kind^ a, Kind^ b) {
+                if (ReferenceEquals(a, b)) return true;
+                if (ReferenceEquals(a, nullptr) || ReferenceEquals(b, nullptr)) return false;
+                return a->Equals(b);
+            }
 
-			static bool operator != (Kind^ a, Kind^ b) {
-				return !(a == b);
-			}
+            static bool operator != (Kind^ a, Kind^ b) {
+                return !(a == b);
+            }
 
-		internal:
-			const ::Kind* _nativePtr;
-	};
+        internal:
+            const ::Kind* _nativePtr;
+    };
 }

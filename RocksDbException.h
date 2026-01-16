@@ -17,17 +17,17 @@
 
 public ref class RocksDbException : public System::Exception
 {
-	public:
-		RocksDbException(int code, System::String^ message)
-			: System::Exception(message), code_(code) {}
+    public:
+        RocksDbException(int code, System::String^ message)
+            : System::Exception(message), code_(code) {}
 
-		property int Code {
-			int get() {
-				return code_;
-			}
-		};
+        property int Code {
+            int get() {
+                return code_;
+            }
+        };
 
-	private:
-		int code_;
+    private:
+        int code_;
 };
 

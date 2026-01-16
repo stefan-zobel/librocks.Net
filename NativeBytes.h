@@ -21,48 +21,48 @@ using namespace System;
 
 namespace librocks::Net {
 
-	public ref class NativeBytes sealed : public IDisposable
-	{
-	internal:
-		NativeBytes(bytes&& native) {
-			_nativePtr = new bytes(std::move(native));
-		}
+    public ref class NativeBytes sealed : public IDisposable
+    {
+    internal:
+        NativeBytes(bytes&& native) {
+            _nativePtr = new bytes(std::move(native));
+        }
 
-	public:
-		// Inherited via IDisposable
-		~NativeBytes() { this->!NativeBytes(); } // Dispose()
+    public:
+        // Inherited via IDisposable
+        ~NativeBytes() { this->!NativeBytes(); } // Dispose()
 
-	protected:
-		// Finalizer
-		!NativeBytes() {
-			if (_nativePtr) {
-				delete _nativePtr;
-				_nativePtr = nullptr;
-			}
-		}
+    protected:
+        // Finalizer
+        !NativeBytes() {
+            if (_nativePtr) {
+                delete _nativePtr;
+                _nativePtr = nullptr;
+            }
+        }
 
-	public:
+    public:
 #pragma warning(push)
 #pragma warning(disable:4996)
-		property ReadOnlySpan<Byte> Span {
-			ReadOnlySpan<Byte> get() {
-				if (!_nativePtr) return ReadOnlySpan<Byte>();
-				return ReadOnlySpan<Byte>((void*)_nativePtr->data(),
-					(int)_nativePtr->size());
-			}
-		}
+        property ReadOnlySpan<Byte> Span {
+            ReadOnlySpan<Byte> get() {
+                if (!_nativePtr) return ReadOnlySpan<Byte>();
+                return ReadOnlySpan<Byte>((void*)_nativePtr->data(),
+                    (int)_nativePtr->size());
+            }
+        }
 #pragma warning(pop)
 
-		virtual String^ ToString() override {
-			if (!_nativePtr || _nativePtr->data() == nullptr)
-			{
-				return String::Empty;
-			}
-			return gcnew String(_nativePtr->data(), 0, (int)_nativePtr->size(),
-				System::Text::Encoding::UTF8);
-		}
+        virtual String^ ToString() override {
+            if (!_nativePtr || _nativePtr->data() == nullptr)
+            {
+                return String::Empty;
+            }
+            return gcnew String(_nativePtr->data(), 0, (int)_nativePtr->size(),
+                System::Text::Encoding::UTF8);
+        }
 
-	private:
-		bytes* _nativePtr;
-	};
+    private:
+        bytes* _nativePtr;
+    };
 }
