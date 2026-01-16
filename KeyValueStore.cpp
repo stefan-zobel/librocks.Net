@@ -41,33 +41,59 @@ namespace librocks::Net {
     Kind^ KeyValueStore::GetDefaultKind()
     {
         ThrowIfDisposed();
-        const ::Kind& nativeKind = _nativePtr->getDefaultKind();
-        return WrapKind(&nativeKind);
+        try {
+            const ::Kind& nativeKind = _nativePtr->getDefaultKind();
+            return WrapKind(&nativeKind);
+        }
+        catch (const RocksException& ex) {
+            throw gcnew RocksDbException(ex.code(), gcnew String(ex.what()));
+        }
+        catch (...)
+        {
+            throw gcnew Exception("An unexpected error occurred while retrieving the default Kind.");
+        }
     }
 
     Kind^ KeyValueStore::GetOrCreateKind(String^ kindName)
     {
         ThrowIfDisposed();
         if (kindName == nullptr) throw gcnew ArgumentNullException("kindName");
-        std::string colFamily{ marshal::marshal_as<std::string>(kindName) };
-        const ::Kind& nativeKind = _nativePtr->getOrCreateKind(colFamily);
-        return WrapKind(&nativeKind);
+        try {
+            std::string colFamily{ marshal::marshal_as<std::string>(kindName) };
+            const ::Kind& nativeKind = _nativePtr->getOrCreateKind(colFamily);
+            return WrapKind(&nativeKind);
+        }
+        catch (const RocksException& ex) {
+            throw gcnew RocksDbException(ex.code(), gcnew String(ex.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred while retrieving or creating the Kind: "
+                + kindName);
+        }
     }
 
     IReadOnlyCollection<Kind^>^ KeyValueStore::GetKinds()
     {
         ThrowIfDisposed();
-        const KindSet nativeSet = _nativePtr->getKinds();
-        List<Kind^>^ managedList = gcnew List<Kind^>((int)nativeSet.size());
-        for (const auto& kindRef : nativeSet) {
-            // kindRef is a std::reference_wrapper<const Kind>,
-            // .get() returns const Kind&, with & we get the address.
-            const ::Kind* pNativeKind = &kindRef.get();
-            // WrapKind uses the _kindCache Dictionary internally, that guarantees
-            // we are re-using the already existing .NET Kind^ instances.
-            managedList->Add(WrapKind(pNativeKind));
+        try {
+            const KindSet nativeSet = _nativePtr->getKinds();
+            List<Kind^>^ managedList = gcnew List<Kind^>((int)nativeSet.size());
+            for (const auto& kindRef : nativeSet) {
+                // kindRef is a std::reference_wrapper<const Kind>,
+                // .get() returns const Kind&, with & we get the address.
+                const ::Kind* pNativeKind = &kindRef.get();
+                // WrapKind uses the _kindCache Dictionary internally, that guarantees
+                // we are re-using the already existing .NET Kind^ instances.
+                managedList->Add(WrapKind(pNativeKind));
+            }
+            return managedList->AsReadOnly();
         }
-        return managedList->AsReadOnly();
+        catch (const RocksException& ex) {
+            throw gcnew RocksDbException(ex.code(), gcnew String(ex.what()));
+        }
+        catch (...) {
+            throw gcnew Exception("An unexpected error occurred while retrieving the Kinds collection.");
+        }
     }
 
     void KeyValueStore::Compact(Kind^ kind)
