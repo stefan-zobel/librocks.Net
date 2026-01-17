@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include "api/api.h"
 #include "api/Clearable.h"
 
@@ -9,6 +10,9 @@ struct LIBROCKS_API Kueue : public Clearable {
 
     [[nodiscard("return value must be delete[]d")]]
     virtual char* take(int* status, size_t* valLen) noexcept = 0;
+
+    [[nodiscard("return value must be delete[]d")]]
+    virtual char* take(int* status, size_t* valLen, std::chrono::milliseconds timeout) noexcept = 0;
 
     virtual void clear(int* status) noexcept override = 0;
 
