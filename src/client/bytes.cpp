@@ -50,7 +50,3 @@ void bytes::copy(const bytes& other) {
     std::memcpy(tmp, other.data_, other.size_);
     data_ = tmp;
 }
-
-void swap(bytes& lhs, bytes& rhs) {
-    lhs.swap(rhs);
-}

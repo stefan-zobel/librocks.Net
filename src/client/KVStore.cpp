@@ -1,8 +1,9 @@
 
 #include "api/librocks.h"
 #include "client/KVStore.h"
-#include "client/RocksException.h"
+#include "../RocksDbException.h"
 
+using namespace System;
 
 KVStore::KVStore(std::string_view path) {
     int status = Status::Ok;
@@ -198,10 +199,10 @@ void KVStore::compactAll() {
 bool KVStore::throwForStatus(int status) {
     if (status != Status::Ok) {
         if (KVStore::codes.count(status)) {
-            throw RocksException(status, KVStore::codes.at(status));
+            throw gcnew RocksDbException(status, gcnew String(KVStore::codes.at(status).c_str()));
         }
         else {
-            throw RocksException(status, "Unknown");
+            throw gcnew RocksDbException(status, gcnew String("Unknown"));
         }
     }
     return false;

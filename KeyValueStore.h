@@ -16,7 +16,6 @@
 #pragma once
 
 #include "client/KVStore.h"
-#include "client/RocksException.h"
 
 #include <msclr/marshal_cppstd.h>
 #include "RocksDbException.h"
@@ -41,9 +40,9 @@ namespace librocks::Net {
                 try {
                     _nativePtr = new KVStore(dbPath);
                 }
-                catch (const RocksException& e) {
+                catch (RocksDbException^) {
                     _nativePtr = nullptr;
-                    throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+                    throw;
                 }
                 catch (...) {
                     _nativePtr = nullptr;

@@ -45,8 +45,8 @@ namespace librocks::Net {
             const ::Kind& nativeKind = _nativePtr->getDefaultKind();
             return WrapKind(&nativeKind);
         }
-        catch (const RocksException& ex) {
-            throw gcnew RocksDbException(ex.code(), gcnew String(ex.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...)
         {
@@ -63,8 +63,8 @@ namespace librocks::Net {
             const ::Kind& nativeKind = _nativePtr->getOrCreateKind(colFamily);
             return WrapKind(&nativeKind);
         }
-        catch (const RocksException& ex) {
-            throw gcnew RocksDbException(ex.code(), gcnew String(ex.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred while retrieving or creating the Kind: "
@@ -88,8 +88,8 @@ namespace librocks::Net {
             }
             return managedList->AsReadOnly();
         }
-        catch (const RocksException& ex) {
-            throw gcnew RocksDbException(ex.code(), gcnew String(ex.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred while retrieving the Kinds collection.");
@@ -105,8 +105,8 @@ namespace librocks::Net {
             try {
                 _nativePtr->compact(*pKind);
             }
-            catch (const RocksException& ex) {
-                throw gcnew RocksDbException(ex.code(), gcnew String(ex.what()));
+            catch (RocksDbException^) {
+                throw;
             }
             catch (...)
             {
@@ -122,8 +122,8 @@ namespace librocks::Net {
         try {
             _nativePtr->compactAll();
         }
-        catch (const RocksException& ex) {
-            throw gcnew RocksDbException(ex.code(), gcnew String(ex.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...)
         {
@@ -170,8 +170,8 @@ namespace librocks::Net {
             // cheap move constructors can be used (only a pointer and length swap).
             return gcnew NativeBytes(std::move(result));
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during UpdateIfPresent() operation.");
@@ -202,8 +202,8 @@ namespace librocks::Net {
         try {
             return _nativePtr->putIfAbsent(*(kind->_nativePtr), nativeKeyView, nativeValueView);
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during PutIfAbsent() operation.");
@@ -234,8 +234,8 @@ namespace librocks::Net {
         try {
             _nativePtr->put(*(kind->_nativePtr), nativeKeyView, nativeValueView);
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during Put() operation.");
@@ -260,8 +260,8 @@ namespace librocks::Net {
             if (!result) return nullptr;
             return gcnew NativeBytes(std::move(result));
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during Get() operation.");
@@ -286,8 +286,8 @@ namespace librocks::Net {
             if (!result) return nullptr;
             return gcnew NativeBytes(std::move(result));
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during SingleRemoveIfPresent() operation.");
@@ -312,8 +312,8 @@ namespace librocks::Net {
             if (!result) return nullptr;
             return gcnew NativeBytes(std::move(result));
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during RemoveIfPresent() operation.");
@@ -336,8 +336,8 @@ namespace librocks::Net {
         try {
             _nativePtr->singleRemove(*(kind->_nativePtr), nativeKeyView);
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during SingleRemove() operation.");
@@ -360,8 +360,8 @@ namespace librocks::Net {
         try {
             _nativePtr->remove(*(kind->_nativePtr), nativeKeyView);
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during Remove() operation.");
@@ -378,9 +378,9 @@ namespace librocks::Net {
             if (!result) return nullptr;
             return gcnew NativeBytes(std::move(result));
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
-        }
+        catch (RocksDbException^) {
+            throw;
+		}
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during FindMinKey() operation.");
         }
@@ -396,8 +396,8 @@ namespace librocks::Net {
             if (!result) return nullptr;
             return gcnew NativeBytes(std::move(result));
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during FindMaxKey() operation.");
@@ -443,8 +443,8 @@ namespace librocks::Net {
             bytesWritten = resultSize;
             return true;
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during TryUpdateIfPresent() operation.");
@@ -479,8 +479,8 @@ namespace librocks::Net {
             bytesWritten = resultSize;
             return true;
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during TryGet() operation.");
@@ -515,8 +515,8 @@ namespace librocks::Net {
             bytesWritten = resultSize;
             return true;
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during TrySingleRemoveIfPresent() operation.");
@@ -551,8 +551,8 @@ namespace librocks::Net {
             bytesWritten = resultSize;
             return true;
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during TryRemoveIfPresent() operation.");
@@ -579,8 +579,8 @@ namespace librocks::Net {
             bytesWritten = resultSize;
             return true;
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during TryFindMinKey() operation.");
@@ -607,8 +607,8 @@ namespace librocks::Net {
             bytesWritten = resultSize;
             return true;
         }
-        catch (const RocksException& e) {
-            throw gcnew RocksDbException(e.code(), gcnew String(e.what()));
+        catch (RocksDbException^) {
+            throw;
         }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during TryFindMaxKey() operation.");
