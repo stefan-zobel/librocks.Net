@@ -380,7 +380,7 @@ namespace librocks::Net {
         }
         catch (RocksDbException^) {
             throw;
-		}
+        }
         catch (...) {
             throw gcnew Exception("An unexpected error occurred during FindMinKey() operation.");
         }
