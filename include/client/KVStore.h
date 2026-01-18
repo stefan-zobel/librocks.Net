@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <map>
 #include <set>
 #include <string_view>
 #include "bytes.h"
@@ -57,7 +56,6 @@ private:
     Store* store;
 
 private:
-    static const std::map<int, std::string> codes;
     static bool throwForStatus(int status);
     KindManager& getKindManager() const;
 };

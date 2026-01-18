@@ -1,7 +1,7 @@
 
 #include "api/librocks.h"
 #include "client/KVStore.h"
-#include "../RocksDbException.h"
+#include "../Codes.h"
 
 using namespace System;
 
@@ -195,44 +195,9 @@ void KVStore::compactAll() {
     }
 }
 
-
 bool KVStore::throwForStatus(int status) {
     if (status != Status::Ok) {
-        if (KVStore::codes.count(status)) {
-            throw gcnew RocksDbException(status, gcnew String(KVStore::codes.at(status).c_str()));
-        }
-        else {
-            throw gcnew RocksDbException(status, gcnew String("Unknown"));
-        }
+        librocks::Net::Codes::ThrowForStatus(status);
     }
     return false;
 }
-
-static std::map<int, std::string> initCodes() {
-    return {
-        {Status::Invalid, "Invalid"},
-        {Status::NoIterator, "NoIterator"},
-        {Status::AlreadyExists, "AlreadyExists"},
-        {Status::NoTransaction, "NoTransaction"},
-        {Status::Closed, "Closed"},
-        {Status::Ok, "Ok"},
-        {Status::NotFound, "NotFound"},
-        {Status::Corruption, "Corruption"},
-        {Status::NotSupported, "NotSupported"},
-        {Status::InvalidArgument, "InvalidArgument"},
-        {Status::IOError, "IOError"},
-        {Status::MergeInProgress, "MergeInProgress"},
-        {Status::Incomplete, "Incomplete"},
-        {Status::ShutdownInProgress, "ShutdownInProgress"},
-        {Status::TimedOut, "TimedOut"},
-        {Status::Aborted, "Aborted"},
-        {Status::Busy, "Busy"},
-        {Status::Expired, "Expired"},
-        {Status::TryAgain, "TryAgain"},
-        {Status::CompactionTooLarge, "CompactionTooLarge"},
-        {Status::ColumnFamilyDropped, "ColumnFamilyDropped"},
-        {Status::Unknown, "Unknown"}
-    };
-}
-
-const std::map<int, std::string> KVStore::codes = initCodes();
