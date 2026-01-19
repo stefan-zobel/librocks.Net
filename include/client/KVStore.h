@@ -52,7 +52,7 @@ public:
 
     void compactAll();
 
-    static bytes construct(char* bytes, size_t length);
+    static bytes constructBytes(char* bytes, size_t length);
 
 private:
     Store* store;

@@ -195,7 +195,7 @@ void KVStore::compactAll() {
     }
 }
 
-bytes KVStore::construct(char* value, size_t length) {
+bytes KVStore::constructBytes(char* value, size_t length) {
     return bytes(value, length);
 }
 

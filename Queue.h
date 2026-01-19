@@ -16,9 +16,12 @@
 #pragma once
 
 #include "api/Kueue.h"
+#include "client/KVStore.h"
 #include "Codes.h"
+#include "NativeBytes.h"
 
 using namespace System;
+using namespace System::Runtime::InteropServices;
 
 namespace librocks::Net {
 
@@ -61,6 +64,28 @@ namespace librocks::Net {
                 }
             }
 
+            NativeBytes^ Take([Optional][DefaultParameterValue(TimeSpan(0))] TimeSpan timeout) {
+                int status = Status::Ok;
+                size_t valLen = 0;
+                if (timeout == TimeSpan::Zero) {
+                    char* nativeBytes = _nativePtr->take(&status, &valLen);
+                    if (status != Status::Ok) {
+                        Codes::ThrowForStatus(status);
+                    }
+                    if (!nativeBytes) return nullptr;
+                    return gcnew NativeBytes(std::move(KVStore::constructBytes(nativeBytes, valLen)));
+                }
+                else {
+                    std::chrono::milliseconds nativeTimeout = ConvertToChrono(timeout);
+                    char* nativeBytes = _nativePtr->take(&status, &valLen, nativeTimeout);
+                    if (!(status == Status::Ok || status == Status::TimedOut)) {
+                        Codes::ThrowForStatus(status);
+                    }
+                    if (!nativeBytes) return nullptr;
+                    return gcnew NativeBytes(std::move(KVStore::constructBytes(nativeBytes, valLen)));
+                }
+            }
+
         private:
             ::Kueue* _nativePtr;
 
@@ -71,5 +96,3 @@ namespace librocks::Net {
             }
     };
 }
-
-
