@@ -52,6 +52,8 @@ public:
 
     void compactAll();
 
+    static bytes construct(char* bytes, size_t length);
+
 private:
     Store* store;
 

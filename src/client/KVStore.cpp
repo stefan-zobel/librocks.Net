@@ -195,6 +195,10 @@ void KVStore::compactAll() {
     }
 }
 
+bytes KVStore::construct(char* value, size_t length) {
+    return bytes(value, length);
+}
+
 bool KVStore::throwForStatus(int status) {
     if (status != Status::Ok) {
         librocks::Net::Codes::ThrowForStatus(status);
