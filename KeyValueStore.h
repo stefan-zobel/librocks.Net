@@ -31,7 +31,7 @@ using namespace System::Runtime::InteropServices;
 
 namespace librocks::Net {
 
-    public ref class KeyValueStore
+    public ref class KeyValueStore /* : public IDisposable */
     {
         public:
             KeyValueStore(String^ path) {
@@ -51,16 +51,18 @@ namespace librocks::Net {
             }
 
             // Inherited via IDisposable
-            ~KeyValueStore() { this->!KeyValueStore(); } // Dispose()
+            ~KeyValueStore() { // Dispose()
+                if (_kindCache) {
+                    _kindCache->Clear();
+                    _kindCache = nullptr;
+                }
+                this->!KeyValueStore();
+            }
 
         protected:
             // Finalizer
             !KeyValueStore() {
                 if (_nativePtr) {
-                    if (_kindCache) {
-                        _kindCache->Clear();
-                        _kindCache = nullptr;
-                    }
                     delete _nativePtr;
                     _nativePtr = nullptr;
                 }

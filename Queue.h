@@ -85,7 +85,8 @@ namespace librocks::Net {
                     return gcnew NativeBytes(std::move(KVStore::constructBytes(nativeBytes, valLen)));
                 }
             }
-
+#pragma warning(push)
+#pragma warning(disable:4996)
             void Put(ReadOnlySpan<Byte> value) {
                 int status = Status::Ok;
                 pin_ptr<const Byte> pValue;
@@ -99,6 +100,7 @@ namespace librocks::Net {
                     Codes::ThrowForStatus(status);
                 }
             }
+#pragma warning(pop)
 
         private:
             ::Kueue* _nativePtr;
