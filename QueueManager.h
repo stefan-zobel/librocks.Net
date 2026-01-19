@@ -24,9 +24,9 @@
 namespace marshal = msclr::interop;
 
 using namespace System;
+using namespace System::Collections::Concurrent;
 
-namespace librocks::Net
-{
+namespace librocks::Net {
 
     public ref class QueueManager /* : public IDisposable */
     {
@@ -63,6 +63,9 @@ namespace librocks::Net
             }
 
         public:
+
+            Queue^ Get(String^ id);
+
             void Close() {
                 delete this;
             }
@@ -75,6 +78,16 @@ namespace librocks::Net
 
         private:
             ::KueueManager* _nativePtr;
+
+            void ThrowIfDisposed() {
+                if (_nativePtr == nullptr) {
+                    throw gcnew ObjectDisposedException("QueueManager");
+                }
+            }
+
+            Queue^ WrapKueue(::Kueue* nativePtr);
+            Queue^ CreateKueueWrapper(IntPtr key);
+            ConcurrentDictionary<IntPtr, Queue^>^ _queueCache;
     };
 }
 
