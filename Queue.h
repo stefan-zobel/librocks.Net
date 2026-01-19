@@ -64,10 +64,10 @@ namespace librocks::Net {
                 }
             }
 
-            NativeBytes^ Take([Optional][DefaultParameterValue(TimeSpan(0))] TimeSpan timeout) {
+            NativeBytes^ Take([Optional] Nullable<TimeSpan> timeout) {
                 int status = Status::Ok;
                 size_t valLen = 0;
-                if (timeout == TimeSpan::Zero) {
+                if (!timeout.HasValue) {
                     char* nativeBytes = _nativePtr->take(&status, &valLen);
                     if (status != Status::Ok) {
                         Codes::ThrowForStatus(status);
@@ -76,7 +76,7 @@ namespace librocks::Net {
                     return gcnew NativeBytes(std::move(KVStore::constructBytes(nativeBytes, valLen)));
                 }
                 else {
-                    std::chrono::milliseconds nativeTimeout = ConvertToChrono(timeout);
+                    std::chrono::milliseconds nativeTimeout = ConvertToChrono(timeout.Value);
                     char* nativeBytes = _nativePtr->take(&status, &valLen, nativeTimeout);
                     if (!(status == Status::Ok || status == Status::TimedOut)) {
                         Codes::ThrowForStatus(status);
