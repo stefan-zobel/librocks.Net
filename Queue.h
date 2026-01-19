@@ -86,6 +86,20 @@ namespace librocks::Net {
                 }
             }
 
+            void Put(ReadOnlySpan<Byte> value) {
+                int status = Status::Ok;
+                pin_ptr<const Byte> pValue;
+
+                if (value.Length > 0) {
+                    pValue = &MemoryMarshal::GetReference(value);
+                    size_t valLen = static_cast<size_t>(value.Length);
+                    _nativePtr->put(&status, reinterpret_cast<const char*>(pValue), valLen);
+                }
+                if (status != Status::Ok) {
+                    Codes::ThrowForStatus(status);
+                }
+            }
+
         private:
             ::Kueue* _nativePtr;
 
