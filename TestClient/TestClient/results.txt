@@ -1,0 +1,74 @@
+
+removed        : 500000 messages
+put & del took : 115251 ms
+average        : 0,230502 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
+removed        : 500000 messages
+put & del took : 115551 ms
+average        : 0,231102 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
+removed        : 500000 messages
+put & del took : 9646 ms
+average        : 0,019292 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
+removed        : 500000 messages
+put & del took : 10424 ms
+average        : 0,020848 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
+removed        : 500000 messages
+put & del took : 10115 ms
+average        : 0,02023 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
+removed        : 500000 messages
+put & del took : 8934 ms
+average        : 0,017868 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
+removed        : 500000 messages
+put & del took : 9279 ms
+average        : 0,018558 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
+RocksDB version: 10.4.2
+removed        : 500000 messages
+put & del took : 11389 ms
+average        : 0.022778 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
+RocksDB version: 10.4.2
+removed        : 500000 messages
+put & del took : 11239 ms
+average        : 0.022478 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
