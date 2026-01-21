@@ -126,17 +126,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Codes.h" />
     <ClInclude Include="include\client\bytes.h" />
     <ClInclude Include="include\client\KVStore.h" />
     <ClInclude Include="KeyValueStore.h" />
     <ClInclude Include="Kind.h" />
     <ClInclude Include="NativeBytes.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Queue.h" />
+    <ClInclude Include="QueueManager.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RocksDbException.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="Codes.cpp" />
     <ClCompile Include="KeyValueStore.cpp" />
     <ClCompile Include="Kind.cpp" />
     <ClCompile Include="NativeBytes.cpp" />
@@ -146,6 +150,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Queue.cpp" />
+    <ClCompile Include="QueueManager.cpp" />
     <ClCompile Include="RocksDbException.cpp" />
     <ClCompile Include="src\client\bytes.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
