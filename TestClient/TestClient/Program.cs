@@ -113,7 +113,7 @@ internal class Program
             {
                 try
                 {
-                    _shared.Take();
+                    using NativeBytes bytes = _shared.Take();
                     ++count;
                 }
                 catch (Exception e)
