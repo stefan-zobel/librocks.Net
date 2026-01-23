@@ -113,8 +113,14 @@ internal class Program
             {
                 try
                 {
-                    using NativeBytes bytes = _shared.Take();
-                    ++count;
+//                    using NativeBytes bytes = _shared.Take();
+                    if (_shared.TryTake(out NativeBytes? data))
+                    {
+                        using (data)
+                        {
+                            ++count;
+                        }
+                    }
                 }
                 catch (Exception e)
                 {

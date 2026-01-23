@@ -46,7 +46,7 @@ namespace librocks::Net {
 #pragma warning(disable:4996)
         property ReadOnlySpan<Byte> Span {
             ReadOnlySpan<Byte> get() {
-                if (!_nativePtr) return ReadOnlySpan<Byte>();
+                if (!_nativePtr) throw gcnew ObjectDisposedException("NativeBytes");
                 return ReadOnlySpan<Byte>((void*)_nativePtr->data(),
                     (int)_nativePtr->size());
             }
@@ -54,10 +54,8 @@ namespace librocks::Net {
 #pragma warning(pop)
 
         virtual String^ ToString() override {
-            if (!_nativePtr || _nativePtr->data() == nullptr)
-            {
-                return String::Empty;
-            }
+            if (!_nativePtr) throw gcnew ObjectDisposedException("NativeBytes");
+            if (_nativePtr->data() == nullptr) return String::Empty;
             return gcnew String(_nativePtr->data(), 0, (int)_nativePtr->size(),
                 System::Text::Encoding::UTF8);
         }
