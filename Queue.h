@@ -25,6 +25,8 @@ using namespace System::Runtime::InteropServices;
 
 namespace librocks::Net {
 
+	public delegate bool QueueMsgConsumer(NativeBytes^ msg);
+
     public ref class Queue sealed
     {
         internal:
@@ -65,7 +67,7 @@ namespace librocks::Net {
             }
 
             bool TryTake([Out] NativeBytes^ %data, [Optional] Nullable<TimeSpan> timeout) {
-                int status = 0;
+                int status = Status::Ok;
                 size_t valLen = 0;
                 char* nativeBytes;
                 if (!timeout.HasValue) {
@@ -88,6 +90,37 @@ namespace librocks::Net {
                 data = gcnew NativeBytes(std::move(KVStore::constructBytes(nativeBytes, valLen)));
                 return true;
             }
+
+            bool TryAccept(QueueMsgConsumer^ consumer, [Optional] Nullable<TimeSpan> timeout) {
+                if (!consumer) {
+                    throw gcnew ArgumentNullException("consumer");
+				}
+                std::chrono::milliseconds nativeTimeout;
+                if (timeout.HasValue) {
+                    nativeTimeout = ConvertToChrono(timeout.Value);
+                }
+                else {
+                    nativeTimeout = ConvertToChrono(TimeSpan::Zero);
+                }
+                int status = Status::Ok;
+                size_t valLen = 0;
+				unsigned long long key = 12345L;
+                char* nativeBytes = _nativePtr->readNext(&status, &valLen, &key, nativeTimeout);
+                if (!(status == Status::Ok || status == Status::TimedOut)) {
+                    Codes::ThrowForStatus(status);
+                }
+                if (nativeBytes) {
+					bool accepted = consumer->Invoke(gcnew NativeBytes(std::move(KVStore::constructBytes(nativeBytes, valLen))));
+                    if (accepted) {
+                        bool erased = _nativePtr->erase(key);
+                        if (!erased) {
+                            throw gcnew Exception("Failed to erase message from queue after acceptance.");
+                        }
+					}
+                    return true;
+				}
+                return false;
+			}
 
             NativeBytes^ Take([Optional] Nullable<TimeSpan> timeout) {
                 int status = Status::Ok;

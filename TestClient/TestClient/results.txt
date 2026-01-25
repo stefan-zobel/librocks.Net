@@ -71,6 +71,30 @@ total takes    : 500000
 queue size     : 0
 done
 
+removed        : 500000 messages
+put & del took : 9800 ms
+average        : 0,0196 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
+removed        : 500000 messages
+put & del took : 9431 ms
+average        : 0,018862 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
+removed        : 500000 messages
+put & del took : 10117 ms
+average        : 0,020234 ms / message
+total puts     : 500000
+total takes    : 500000
+queue size     : 0
+done
+
 RocksDB version: 10.4.2
 removed        : 500000 messages
 put & del took : 11389 ms

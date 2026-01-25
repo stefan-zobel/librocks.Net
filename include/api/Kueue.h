@@ -14,6 +14,11 @@ struct LIBROCKS_API Kueue : public Clearable {
     [[nodiscard("return value must be delete[]d")]]
     virtual char* take(int* status, size_t* valLen, std::chrono::milliseconds timeout) noexcept = 0;
 
+    [[nodiscard("return value must be delete[]d")]]
+    virtual char* readNext(int* status, size_t* valLen, unsigned long long* pKey, std::chrono::milliseconds timeout) noexcept = 0;
+
+    virtual bool erase(unsigned long long key) noexcept = 0;
+
     virtual void clear(int* status) noexcept override = 0;
 
     virtual long long size() const noexcept = 0;

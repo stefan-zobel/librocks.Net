@@ -95,16 +95,26 @@ internal class Program
         private readonly Queue _shared;
         private readonly int _max;
         private readonly Thread _thread;
+        private readonly QueueMsgConsumer _queueMsgConsumer;
 
         public Consumer(Queue shared, int max)
         {
             _shared = shared;
             _max = max;
             _thread = new Thread(Run);
+            _queueMsgConsumer = new QueueMsgConsumer(AcceptData);
         }
 
         public void Start() => _thread.Start();
         public void Join() => _thread.Join();
+
+        private static bool AcceptData(NativeBytes data)
+        {
+            using (data)
+            {
+            }
+            return true;
+        }
 
         private void Run()
         {
@@ -113,13 +123,9 @@ internal class Program
             {
                 try
                 {
-//                    using NativeBytes bytes = _shared.Take();
-                    if (_shared.TryTake(out NativeBytes? data))
+                    if (_shared.TryAccept(_queueMsgConsumer, TimeSpan.FromMilliseconds(64L)))
                     {
-                        using (data)
-                        {
-                            ++count;
-                        }
+                        ++count;
                     }
                 }
                 catch (Exception e)
