@@ -25,7 +25,7 @@ using namespace System::Runtime::InteropServices;
 
 namespace librocks::Net {
 
-	public delegate bool QueueMsgConsumer(NativeBytes^ msg);
+    public delegate bool QueueMsgConsumer(NativeBytes^ msg);
 
     public ref class Queue sealed
     {
@@ -94,7 +94,7 @@ namespace librocks::Net {
             bool TryAccept(QueueMsgConsumer^ consumer, [Optional] Nullable<TimeSpan> timeout) {
                 if (!consumer) {
                     throw gcnew ArgumentNullException("consumer");
-				}
+                }
                 std::chrono::milliseconds nativeTimeout;
                 if (timeout.HasValue) {
                     nativeTimeout = ConvertToChrono(timeout.Value);
@@ -104,47 +104,27 @@ namespace librocks::Net {
                 }
                 int status = Status::Ok;
                 size_t valLen = 0;
-				unsigned long long key = 12345L;
+                unsigned long long key = 0L;
                 char* nativeBytes = _nativePtr->readNext(&status, &valLen, &key, nativeTimeout);
                 if (!(status == Status::Ok || status == Status::TimedOut)) {
                     Codes::ThrowForStatus(status);
                 }
                 if (nativeBytes) {
-					bool accepted = consumer->Invoke(gcnew NativeBytes(std::move(KVStore::constructBytes(nativeBytes, valLen))));
+                    bool accepted = consumer->Invoke(gcnew NativeBytes(std::move(KVStore::constructBytes(nativeBytes, valLen))));
                     if (accepted) {
                         bool erased = _nativePtr->erase(key);
                         if (!erased) {
                             throw gcnew Exception("Failed to erase message from queue after acceptance.");
                         }
-					}
+                    }
                     return true;
-				}
+                }
                 return false;
-			}
-
-            NativeBytes^ Take([Optional] Nullable<TimeSpan> timeout) {
-                int status = Status::Ok;
-                size_t valLen = 0;
-                if (!timeout.HasValue) {
-                    char* nativeBytes = _nativePtr->take(&status, &valLen);
-                    if (status != Status::Ok) {
-                        Codes::ThrowForStatus(status);
-                    }
-                    if (!nativeBytes) return nullptr;
-                    return gcnew NativeBytes(std::move(KVStore::constructBytes(nativeBytes, valLen)));
-                }
-                else {
-                    std::chrono::milliseconds nativeTimeout = ConvertToChrono(timeout.Value);
-                    char* nativeBytes = _nativePtr->take(&status, &valLen, nativeTimeout);
-                    if (!(status == Status::Ok || status == Status::TimedOut)) {
-                        Codes::ThrowForStatus(status);
-                    }
-                    if (!nativeBytes) return nullptr;
-                    return gcnew NativeBytes(std::move(KVStore::constructBytes(nativeBytes, valLen)));
-                }
             }
+
 #pragma warning(push)
 #pragma warning(disable:4996)
+
             void Put(ReadOnlySpan<Byte> value) {
                 int status = Status::Ok;
                 pin_ptr<const Byte> pValue;
@@ -158,6 +138,7 @@ namespace librocks::Net {
                     Codes::ThrowForStatus(status);
                 }
             }
+
 #pragma warning(pop)
 
         private:

@@ -110,9 +110,7 @@ internal class Program
 
         private static bool AcceptData(NativeBytes data)
         {
-            using (data)
-            {
-            }
+            using (data) { }
             return true;
         }
 
@@ -188,7 +186,13 @@ internal class Program
         {
             String s = $"Test {i}";
             q.Put(System.Text.Encoding.UTF8.GetBytes(s));
-            Console.WriteLine(q.Take(TimeSpan.FromSeconds(1)));
+            if (q.TryTake(out NativeBytes bytes_))
+            {
+                using (bytes_)
+                {
+                    Console.WriteLine($"Sent: {s}, Received: {bytes_.ToString}");
+                }
+            }
         }
     }
 }
