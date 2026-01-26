@@ -95,12 +95,9 @@ namespace librocks::Net {
                 if (!consumer) {
                     throw gcnew ArgumentNullException("consumer");
                 }
-                std::chrono::milliseconds nativeTimeout;
+				std::chrono::milliseconds nativeTimeout = std::chrono::milliseconds(0LL);
                 if (timeout.HasValue) {
                     nativeTimeout = ConvertToChrono(timeout.Value);
-                }
-                else {
-                    nativeTimeout = ConvertToChrono(TimeSpan::Zero);
                 }
                 int status = Status::Ok;
                 size_t valLen = 0;
