@@ -12,5 +12,11 @@ struct LIBROCKS_API KueueManager {
 
     virtual void close() noexcept = 0;
 
+    virtual const char* getRocksDBVersion() const noexcept = 0;
+
+    virtual void compactAll(int* status) noexcept = 0;
+
+    virtual void syncWal(int* status) noexcept = 0;
+
     virtual ~KueueManager() = default;
 };

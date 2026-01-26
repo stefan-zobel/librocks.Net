@@ -76,6 +76,46 @@ namespace librocks::Net {
                 }
             }
 
+            String^ GetRocksDBVersion() {
+                ThrowIfDisposed();
+                const char* version = _nativePtr->getRocksDBVersion();
+                return gcnew String(version);
+            }
+
+            void CompactAll() {
+                ThrowIfDisposed();
+                try {
+                    int status = Status::Ok;
+                    _nativePtr->compactAll(&status);
+                    if (status != Status::Ok) {
+                        Codes::ThrowForStatus(status);
+                    }
+                }
+                catch (RocksDbException^) {
+                    throw;
+                }
+                catch (...) {
+                    throw gcnew Exception("An unexpected error occurred during CompactAll() compaction.");
+                }
+            }
+
+            void SyncWal() {
+                ThrowIfDisposed();
+                try {
+                    int status = Status::Ok;
+                    _nativePtr->syncWal(&status);
+                    if (status != Status::Ok) {
+                        Codes::ThrowForStatus(status);
+                    }
+                }
+                catch (RocksDbException^) {
+                    throw;
+                }
+                catch (...) {
+                    throw gcnew Exception("An unexpected error occurred during SyncWal() operation.");
+                }
+            }
+
         private:
             ::KueueManager* _nativePtr;
 
