@@ -30,14 +30,17 @@ internal class Program
 
         long elapsedMs = sw.ElapsedMilliseconds;
 
+        Console.WriteLine($"identifier     : {kueue.Identifier}");
         Console.WriteLine($"put & del took : {elapsedMs} ms");
         Console.WriteLine($"average        : {elapsedMs / (double)MSG_COUNT} ms / message");
         Console.WriteLine($"total puts     : {kueue.TotalPuts}");
         Console.WriteLine($"total takes    : {kueue.TotalTakes}");
         Console.WriteLine($"queue size     : {kueue.Size}");
+        Console.WriteLine($"RocksDB version: {km.GetRocksDBVersion()}");
         Console.WriteLine("done");
 
-//        km.CompactAll();
+        km.SyncWal();
+        km.CompactAll();
     }
 
     class Producer
@@ -60,7 +63,7 @@ internal class Program
         private void Run()
         {
             int count = 0;
-            while (/*!_shared.IsClosed &&*/ count < _max)
+            while (count < _max)
             {
                 try
                 {
@@ -117,7 +120,7 @@ internal class Program
         private void Run()
         {
             int count = 0;
-            while (/*!_shared.IsClosed &&*/ count < _max)
+            while (count < _max)
             {
                 try
                 {
@@ -132,7 +135,6 @@ internal class Program
                     throw;
                 }
             }
-//            Console.WriteLine($"RocksDB version: {_shared.GetKueueManager().GetRocksDBVersion()}");
             Console.WriteLine($"removed        : {count} messages");
         }
     }
