@@ -66,6 +66,13 @@ namespace librocks::Net {
                 }
             }
 
+            property String^ Identifier {
+                String^ get() {
+                    const char* id = _nativePtr->identifier();
+                    return gcnew String(id);
+                }
+            }
+
             bool TryTake([Out] NativeBytes^ %data, [Optional] Nullable<TimeSpan> timeout) {
                 int status = Status::Ok;
                 size_t valLen = 0;

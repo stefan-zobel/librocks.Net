@@ -29,5 +29,7 @@ struct LIBROCKS_API Kueue : public Clearable {
 
     virtual unsigned long long totalTakes() const noexcept = 0;
 
+    virtual const char* identifier() const noexcept = 0;
+
     virtual ~Kueue() = default;
 };
