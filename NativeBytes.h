@@ -53,6 +53,13 @@ namespace librocks::Net {
         }
 #pragma warning(pop)
 
+        property int Length {
+            int get() {
+                if (!_nativePtr) throw gcnew ObjectDisposedException("NativeBytes");
+                return (int)_nativePtr->size();
+            }
+        }
+
         virtual String^ ToString() override {
             if (!_nativePtr) throw gcnew ObjectDisposedException("NativeBytes");
             if (_nativePtr->data() == nullptr) return String::Empty;
